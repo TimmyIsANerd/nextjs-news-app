@@ -1,86 +1,90 @@
-import type { NextPage } from 'next'
 import Head from 'next/head'
-import Image from 'next/image'
+import { useEffect, useState } from 'react'
+import axios from 'axios';
 
-const Home: NextPage = () => {
+export default function Home() {
+
+  const [query, setQuery] = useState('World War 3');
+  const [response, setResponse] = useState<any[] | null>(null);
+  const [btnText, setBtnText] = useState('Search');
+
+  const fetchNews = async (e: any) => {
+    e.preventDefault();
+    try {
+      setBtnText('Searching...');
+      const res = await axios.get('/api/news', {
+        params: {
+          query
+        }
+      });
+      setResponse(res.data.value);
+    } catch (err) {
+      console.log(err)
+    }
+    setBtnText('Search');
+  }
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center py-2">
+    <div>
       <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
+        <title>HEX News App | RAPID API Project</title>
       </Head>
+      <div className="flex flex-col items-center relative min-h-screen bg-background">
 
-      <main className="flex w-full flex-1 flex-col items-center justify-center px-20 text-center">
-        <h1 className="text-6xl font-bold">
-          Welcome to{' '}
-          <a className="text-blue-600" href="https://nextjs.org">
-            Next.js!
-          </a>
-        </h1>
+        <h2 className="font-raleway font-bold text-6xl text-primary pt-20 pb-6 md:text-3xl">
+          HEX <span className="text-active">News</span> App
+        </h2>
 
-        <p className="mt-3 text-2xl">
-          Get started by editing{' '}
-          <code className="rounded-md bg-gray-100 p-3 font-mono text-lg">
-            pages/index.tsx
-          </code>
-        </p>
+        <h3 className="text-secondary text-2xl font-raleway font-bold uppercase tracking-wide mb-12 md:text-base md:px-4 md:text-center mx-5">
+          Get the latest news
+        </h3>
 
-        <div className="mt-6 flex max-w-4xl flex-wrap items-center justify-around sm:w-full">
-          <a
-            href="https://nextjs.org/docs"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Documentation &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Find in-depth information about Next.js features and API.
-            </p>
-          </a>
+        <div className="flex flex-col justify-between items-center w-full md:items-center">
+          <form action="" className="flex w-full justify-center md:flex-col md:w-5/6">
+            <input
+              type="text"
+              autoFocus={true}
+              className="border-none outline-none focus:ring-2 focus:ring-active w-2/5 bg-primary px-4 py-2 rounded-sm font-raleway md:w-full"
+              placeholder='Search for anything...'
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+            />
 
-          <a
-            href="https://nextjs.org/learn"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Learn &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Learn about Next.js in an interactive course with quizzes!
-            </p>
-          </a>
+            <button className="outline-none border border-active font-bold font-raleway ml-4 px-12 py-2 rounded-sm bg-active text-primary transition duration-300 hover:bg-background hover:text-black md:ml-0 md:mt-4"
+            onClick={fetchNews}
+            >
+              {btnText}
+            </button>
+          </form>
 
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Examples &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Discover and deploy boilerplate example Next.js projects.
-            </p>
-          </a>
+          {response && (
+            <div className="flex flex-wrap justify-center mt-4 font-light text-primary font-raleway w-5/6 rounded-sm cursor-pointer md:w-80 md:h-40 ">
+              {response.map(res => {
+                return (
+                  <div className='w-2/6 h-72 border-2 border-active mx-6 my-16' key={res.id}>
+                    <a href={res.url} className="inline-block w-full h-full">
+                      <img src={res.image.url} alt={res.title} className="w-full h-full" />
 
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Deploy &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+                      <div className="flex justify-center w-full mt-4">
+                        <h3 className='w-5/6 text-center'>
+                          {res.title}
+                        </h3>
+                      </div>
+                    </a>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
-      </main>
 
-      <footer className="flex h-24 w-full items-center justify-center border-t">
-        <a
-          className="flex items-center justify-center gap-2"
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-        </a>
-      </footer>
+        <div className="flex flex-col mt-10 justify-center">
+          <p className="block mt-10 mb-10 text-center text-secondary text-xs">
+            Made by Adefeyitimi Adeyeloja
+            <a href="https://github.com/TimmyIsANerd/nextjs-news-app" className="hover:text-active"> Check it out on GitHub</a>
+          </p>
+        </div>
+      </div>
     </div>
   )
 }
-
-export default Home
