@@ -63,7 +63,7 @@ export default function Home() {
                 return (
                   <div className='w-2/6 h-72 border-2 border-active mx-6 my-16' key={res.id}>
                     <a href={res.url} className="inline-block w-full h-full">
-                      <img src={res.image.url} alt={res.title} className="w-full h-full" />
+                      <img src={res.image.url} alt={res.title} className="w-full h-full object-cover" />
 
                       <div className="flex justify-center w-full mt-4">
                         <h3 className='w-5/6 text-center'>
